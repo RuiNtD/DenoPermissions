@@ -1,8 +1,3 @@
-/**
- * Helpers for interacting with Deno's permissions system.
- * @module
- */
-
 const { PermissionDenied } = Deno.errors;
 
 function getValue(pd: Deno.PermissionDescriptor): string | undefined {
@@ -54,7 +49,7 @@ export function getDenoArg(descriptor: Deno.PermissionDescriptor): string {
  * prompt for it.  The function resolves with all of the granted permissions.
  */
 export async function grant(
-  descriptors: Deno.PermissionDescriptor[],
+  descriptors: Deno.PermissionDescriptor[]
 ): Promise<Deno.PermissionDescriptor[]> {
   const result: Deno.PermissionDescriptor[] = [];
   for (const descriptor of descriptors) {
@@ -90,7 +85,7 @@ export async function grantOrThrow(descriptors: Deno.PermissionDescriptor[]) {
   if (denied.length) {
     const perms = denied.map((pd) => `  ${getDenoArg(pd)}`).join("\n");
     throw new PermissionDenied(
-      `The following permissions have not been granted:\n${perms}`,
+      `The following permissions have not been granted:\n${perms}`
     );
   }
 }
