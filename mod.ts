@@ -7,6 +7,7 @@ function getValue(pd: Deno.PermissionDescriptor): string | undefined {
     case "ffi":
       return `${pd.path || ""}`;
     case "net":
+    case "import":
       return pd.host;
     case "run":
       return `${pd.command || ""}`;
@@ -29,6 +30,12 @@ export function getDenoArg(descriptor: Deno.PermissionDescriptor): string {
     : `--allow-${descriptor.name}`;
 }
 
+export function getDenoArgs(
+  descriptors: Deno.PermissionDescriptor[],
+): string[] {
+  return descriptors.map((pd) => getDenoArg(pd));
+}
+
 /** Attempts to grant a set of permissions, resolving with the descriptors of
  * the permissions that are granted.
  *
@@ -49,7 +56,7 @@ export function getDenoArg(descriptor: Deno.PermissionDescriptor): string {
  * prompt for it.  The function resolves with all of the granted permissions.
  */
 export async function grant(
-  descriptors: Deno.PermissionDescriptor[]
+  descriptors: Deno.PermissionDescriptor[],
 ): Promise<Deno.PermissionDescriptor[]> {
   const result: Deno.PermissionDescriptor[] = [];
   for (const descriptor of descriptors) {
@@ -85,7 +92,7 @@ export async function grantOrThrow(descriptors: Deno.PermissionDescriptor[]) {
   if (denied.length) {
     const perms = denied.map((pd) => `  ${getDenoArg(pd)}`).join("\n");
     throw new PermissionDenied(
-      `The following permissions have not been granted:\n${perms}`
+      `The following permissions have not been granted:\n${perms}`,
     );
   }
 }
